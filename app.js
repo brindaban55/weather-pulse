@@ -564,6 +564,186 @@ document.getElementById("viewPrecipChartBtn").addEventListener("click", () => {
   if (state.weatherData) renderHourlyChart(state.weatherData.hourly);
 });
 
+// ==========================================================================
+// Doppler Radar Scanner Animation (Live 250km Dual-Pol Simulation)
+// ==========================================================================
+function initDopplerRadar() {
+  const canvas = document.getElementById("dopplerRadarCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const size = canvas.width;
+  const center = size / 2;
+  const radius = center - 6;
+
+  let sweepAngle = 0;
+
+  // Generate simulated precipitation blips
+  const blips = [
+    { angle: 0.8, dist: 0.45, intensity: "rgba(52, 211, 153, 0.8)", size: 10 },
+    { angle: 0.95, dist: 0.52, intensity: "rgba(251, 191, 36, 0.9)", size: 14 },
+    { angle: 1.1, dist: 0.48, intensity: "rgba(239, 68, 68, 0.85)", size: 8 },
+    { angle: 2.4, dist: 0.65, intensity: "rgba(56, 189, 248, 0.8)", size: 12 },
+    { angle: 2.6, dist: 0.72, intensity: "rgba(52, 211, 153, 0.75)", size: 16 },
+    { angle: 4.2, dist: 0.35, intensity: "rgba(56, 189, 248, 0.85)", size: 11 },
+    { angle: 5.1, dist: 0.58, intensity: "rgba(251, 191, 36, 0.8)", size: 13 }
+  ];
+
+  function renderRadar() {
+    ctx.clearRect(0, 0, size, size);
+
+    // 1. Concentric Range Rings (50km, 100km, 150km, 200km)
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.22)";
+    ctx.lineWidth = 1;
+    for (let r = 1; r <= 4; r++) {
+      ctx.beginPath();
+      ctx.arc(center, center, (radius / 4) * r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 2. Azimuth Crosshairs
+    ctx.beginPath();
+    ctx.moveTo(center, center - radius);
+    ctx.lineTo(center, center + radius);
+    ctx.moveTo(center - radius, center);
+    ctx.lineTo(center + radius, center);
+    ctx.stroke();
+
+    // 3. Fading Sector Trail behind Sweep Beam
+    const trailSegments = 24;
+    const trailSpan = 0.55; // radians
+    for (let i = 0; i < trailSegments; i++) {
+      const alpha = (1 - i / trailSegments) * 0.18;
+      const startA = sweepAngle - (trailSpan / trailSegments) * (i + 1);
+      const endA = sweepAngle - (trailSpan / trailSegments) * i;
+
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.arc(center, center, radius, startA, endA);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+      ctx.fill();
+    }
+
+    // 4. Draw Weather Echo Blips (Light up when swept over)
+    blips.forEach(b => {
+      const bx = center + Math.cos(b.angle) * (radius * b.dist);
+      const by = center + Math.sin(b.angle) * (radius * b.dist);
+
+      let diff = (sweepAngle - b.angle) % (Math.PI * 2);
+      if (diff < 0) diff += Math.PI * 2;
+
+      let brightness = 0.2;
+      if (diff < 0.4) {
+        brightness = 1.0 - (diff / 0.4) * 0.7; // bright flash when swept
+      }
+
+      ctx.beginPath();
+      ctx.arc(bx, by, b.size * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = b.intensity;
+      ctx.globalAlpha = brightness;
+      ctx.shadowBlur = brightness > 0.5 ? 12 : 2;
+      ctx.shadowColor = b.intensity;
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.shadowBlur = 0;
+    });
+
+    // 5. Sweep Beam Line
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.lineTo(center + Math.cos(sweepAngle) * radius, center + Math.sin(sweepAngle) * radius);
+    ctx.strokeStyle = "rgba(186, 230, 253, 0.95)";
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+
+    // 6. Center Origin Node
+    ctx.beginPath();
+    ctx.arc(center, center, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#38bdf8";
+    ctx.fill();
+
+    sweepAngle = (sweepAngle + 0.028) % (Math.PI * 2);
+    requestAnimationFrame(renderRadar);
+  }
+  renderRadar();
+}
+
+// ==========================================================================
+// Ambient Atmospheric Audio Synthesizer (Web Audio API)
+// ==========================================================================
+let audioContext = null;
+let soundPlaying = false;
+let noiseNode = null;
+let filterNode = null;
+let gainNode = null;
+
+function toggleAtmosphereAudio() {
+  const soundBtn = document.getElementById("weatherSoundToggle");
+  const soundIcon = document.getElementById("soundIcon");
+  const soundText = document.getElementById("soundText");
+
+  if (!soundPlaying) {
+    try {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
+      // Generate 5-second procedural white noise buffer for gentle atmosphere
+      const bufferSize = audioContext.sampleRate * 4;
+      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      noiseNode = audioContext.createBufferSource();
+      noiseNode.buffer = noiseBuffer;
+      noiseNode.loop = true;
+
+      // Gentle bandpass filter (simulates soft wind / light rain sound)
+      filterNode = audioContext.createBiquadFilter();
+      filterNode.type = "bandpass";
+      filterNode.frequency.value = 650;
+      filterNode.Q.value = 1.2;
+
+      gainNode = audioContext.createGain();
+      gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.04, audioContext.currentTime + 1.5);
+
+      noiseNode.connect(filterNode);
+      filterNode.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      noiseNode.start(0);
+      soundPlaying = true;
+      soundBtn.classList.add("active");
+      soundIcon.setAttribute("data-lucide", "volume-2");
+      soundText.textContent = "Playing";
+    } catch (err) {
+      console.warn("Audio initiation error:", err);
+    }
+  } else {
+    if (gainNode && audioContext) {
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.8);
+      setTimeout(() => {
+        if (noiseNode) {
+          noiseNode.stop();
+          noiseNode.disconnect();
+        }
+        soundPlaying = false;
+        soundBtn.classList.remove("active");
+        soundIcon.setAttribute("data-lucide", "volume-x");
+        soundText.textContent = "Audio";
+        if (window.lucide) lucide.createIcons();
+      }, 800);
+    }
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
 // Click outside dropdown to close
 document.addEventListener("click", (e) => {
   if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
@@ -574,4 +754,10 @@ document.addEventListener("click", (e) => {
 // Initial boot
 document.addEventListener("DOMContentLoaded", () => {
   fetchWeatherData(state.lat, state.lon);
+  initDopplerRadar();
+
+  const soundBtn = document.getElementById("weatherSoundToggle");
+  if (soundBtn) {
+    soundBtn.addEventListener("click", toggleAtmosphereAudio);
+  }
 });
