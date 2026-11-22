@@ -4,16 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeatherPulse • Intelligent Weather Radar & Forecast</title>
-  <meta name="description" content="Real-time global weather intelligence dashboard powered by Open-Meteo API. Interactive visualizer, hourly forecasts, and 7-day outlook.">
+  <meta name="description" content="Real-time global weather intelligence dashboard powered by Open-Meteo API. Interactive Doppler visualizer, hourly forecasts, and 7-day outlook.">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
 </head>
 <body>
   <!-- Ambient Weather Canvas Background -->
@@ -28,7 +29,7 @@
         </div>
         <div class="brand-text">
           <h1>Weather<span>Pulse</span></h1>
-          <p>Live Global Meteorological Data</p>
+          <p>Live Global Meteorological Intelligence</p>
         </div>
       </div>
 
@@ -44,6 +45,10 @@
           <i data-lucide="map-pin"></i>
           <span>Locate</span>
         </button>
+        <button id="weatherSoundToggle" class="action-btn sound-btn" title="Toggle Ambient Atmosphere Audio">
+          <i data-lucide="volume-2" id="soundIcon"></i>
+          <span id="soundText">Audio</span>
+        </button>
         <div class="unit-toggle-group">
           <button id="unitC" class="unit-btn active">°C</button>
           <button id="unitF" class="unit-btn">°F</button>
@@ -53,7 +58,7 @@
 
     <!-- Quick Location Chips -->
     <div class="quick-chips-bar">
-      <span class="chips-label"><i data-lucide="trending-up"></i> Popular:</span>
+      <span class="chips-label"><i data-lucide="trending-up"></i> Quick Metros:</span>
       <div class="chips-list">
         <button class="chip" data-city="London" data-lat="51.5085" data-lon="-0.1257" data-country="United Kingdom">London</button>
         <button class="chip" data-city="Tokyo" data-lat="35.6895" data-lon="139.6917" data-country="Japan">Tokyo</button>
@@ -61,6 +66,53 @@
         <button class="chip" data-city="Kolkata" data-lat="22.5626" data-lon="88.363" data-country="India">Kolkata</button>
         <button class="chip" data-city="Paris" data-lat="48.8534" data-lon="2.3488" data-country="France">Paris</button>
         <button class="chip" data-city="Dubai" data-lat="25.2048" data-lon="55.2708" data-country="United Arab Emirates">Dubai</button>
+      </div>
+    </div>
+
+    <!-- Atmospheric Telemetry & Doppler Radar Hero Banner -->
+    <div class="glass-card atmosphere-hero-card">
+      <div class="atmosphere-hero-grid">
+        <div class="atmosphere-visual-wrap">
+          <img src="assets/banner.jpg" alt="WeatherPulse Global Radar" class="atmosphere-hero-img" />
+          <div class="atmosphere-hero-overlay"></div>
+          <div class="atmosphere-live-badge">
+            <span class="live-dot"></span> LIVE METEOROLOGICAL RADAR TELEMETRY
+          </div>
+          <div class="atmosphere-caption">
+            <h3>Global High-Resolution Atmospheric Sweep</h3>
+            <p>Real-time Doppler precipitation echoes, isobaric contour modeling, and multi-model forecast telemetry.</p>
+          </div>
+        </div>
+
+        <div class="radar-telemetry-panel">
+          <div class="radar-header">
+            <div class="radar-title">
+              <i data-lucide="radio" class="radar-icon-pulse"></i>
+              <h4>Doppler Radar Scanner</h4>
+            </div>
+            <span class="radar-sweep-status" id="radarSweepStatus"><span class="blink-dot"></span> 250km Dual-Pol</span>
+          </div>
+
+          <div class="radar-canvas-container">
+            <canvas id="dopplerRadarCanvas" width="220" height="220"></canvas>
+            <div class="radar-reticle"></div>
+          </div>
+
+          <div class="radar-metrics-row">
+            <div class="telemetry-pill">
+              <span class="pill-label">Band</span>
+              <span class="pill-val">S-Band Dual</span>
+            </div>
+            <div class="telemetry-pill">
+              <span class="pill-label">Resolution</span>
+              <span class="pill-val">0.25 km²</span>
+            </div>
+            <div class="telemetry-pill">
+              <span class="pill-label">Ionosphere</span>
+              <span class="pill-val status-good">Optimal</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -118,7 +170,7 @@
           </div>
         </div>
 
-        <!-- 8 Meteorological Metric Tiles -->
+        <!-- 6 Meteorological Metric Tiles -->
         <div class="metrics-grid">
           <!-- Wind -->
           <div class="glass-card metric-tile">
@@ -257,8 +309,7 @@
 
     <!-- Footer -->
     <footer class="glass-footer">
-      <p>WeatherPulse • Live Data streamed from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> API • High Precision Forecast Models</p>
-      <a href="../index.html" class="back-hub-link"><i data-lucide="arrow-left"></i> Back to Projects Suite</a>
+      <p>WeatherPulse • Live Atmospheric Data streamed from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> API • High Precision Forecast Models</p>
     </footer>
   </div>
 

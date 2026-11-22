@@ -912,3 +912,234 @@ body {
     font-size: 4rem;
   }
 }
+
+
+/* ==========================================================================
+   Atmospheric Telemetry & Doppler Radar Hero Styling
+   ========================================================================== */
+
+.atmosphere-hero-card {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(20, 27, 45, 0.9));
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(56, 189, 248, 0.15);
+}
+
+.atmosphere-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  min-height: 240px;
+}
+
+.atmosphere-visual-wrap {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  background: #080d1a;
+}
+
+.atmosphere-hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.85;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.atmosphere-hero-card:hover .atmosphere-hero-img {
+  transform: scale(1.03);
+}
+
+.atmosphere-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(10, 15, 29, 0.2) 0%, rgba(10, 15, 29, 0.9) 100%);
+}
+
+.atmosphere-live-badge {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #38bdf8;
+  z-index: 2;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #38bdf8;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #38bdf8;
+  animation: pulse 1.6s infinite;
+}
+
+.atmosphere-caption {
+  position: relative;
+  z-index: 2;
+}
+
+.atmosphere-caption h3 {
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  color: #fff;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.atmosphere-caption p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  max-width: 540px;
+  line-height: 1.5;
+}
+
+/* Radar Telemetry Panel */
+.radar-telemetry-panel {
+  padding: 20px 24px;
+  background: rgba(13, 20, 38, 0.95);
+  border-left: 1px solid rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.radar-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.radar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.radar-title h4 {
+  font-family: var(--font-heading);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.radar-icon-pulse {
+  color: #38bdf8;
+  width: 17px;
+  height: 17px;
+}
+
+.radar-sweep-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #34d399;
+}
+
+.blink-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulse 1.2s infinite;
+}
+
+.radar-canvas-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 24px -2px rgba(56, 189, 248, 0.3), inset 0 0 16px rgba(56, 189, 248, 0.15);
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, rgba(10, 15, 29, 0.95) 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#dopplerRadarCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.radar-metrics-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.telemetry-pill {
+  background: rgba(30, 41, 69, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.pill-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.pill-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.status-good {
+  color: #34d399;
+}
+
+.sound-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+@media (max-width: 900px) {
+  .atmosphere-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .radar-telemetry-panel {
+    border-left: none;
+    border-top: 1px solid rgba(56, 189, 248, 0.15);
+  }
+}
